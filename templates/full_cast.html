@@ -1,0 +1,29 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="container">
+
+    <h1 class="my-4">
+        {{ movie.title }}
+    </h1>
+
+    <h3 class="my-4">Full cast</h3>
+    <h5 class="my-4"><a href="{{ url_for('movie_details', movie_id=movie.id) }}">Back to title</a></h5>
+    <div class="row">
+        {% for person in cast %}
+            <div class="col-md-3 col-sm-6 mb-4">
+            <a href="#">
+                <figure class="figure">
+                    {% if person.profile_path %}
+                        <img src="{{tmdb_image_url(person.profile_path, "w185")}}" class="figure-img img-fluid rounded" alt="person">
+                    {% else %}
+                        <img src="https://placehold.it/185x278?text={{ person.name }}" class="figure-img img-fluid rounded" alt="{{ person.name }}">
+                    {% endif %}
+                    <figcaption class="figure-caption">{{ person.name }} ({{person.character}})</figcaption>
+                </figure>
+            </a>
+            </div>  
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}    
