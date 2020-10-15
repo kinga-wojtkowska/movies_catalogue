@@ -1,4 +1,5 @@
 import tmdb_client
+import pytest, flask
 from main import app
 from unittest.mock import Mock
 
@@ -56,3 +57,25 @@ def test_get_single_movie_cast(monkeypatch):
     monkeypatch.setattr("tmdb_client.call_tmdb_api", call_tmdb_api_mock)
     movie_cast = tmdb_client.get_single_movie_cast(movie_id=1)
     return movie_cast == mock_movie_cast
+
+
+@pytest.mark.parametrize('list_type', (
+    ('movie/now_playing'),
+    ('movie/top_rated'),
+    ('movie/upcoming'),
+    ('movie/popular')
+))
+
+
+def test_homepage(monkeypatch, list_type):
+    api_mock = Mock(return_value={'results': []})
+    monkeypatch.setattr("tmdb_client.call_tmdb_api", api_mock)
+
+    with app.test_request_context(f"/?list_type={list_type}"):
+        assert flask.request.path == '/'
+        assert flask.request.args['list_type'] == list_type
+    
+    with app.test_client() as client:
+        response = client.get("/")
+        assert response.status_code == 200
+        api_mock.assert_called_once_with('movie/popular')
